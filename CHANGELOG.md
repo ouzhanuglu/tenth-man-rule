@@ -6,13 +6,21 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-11-22
+
 ### Added
 
-- `actionlint` 1.7.7 runs in the `validate` workflow as its own `workflows` job: pinned
-  release, published checksum verified, then the workflow files are linted explicitly.
-  Verified locally both ways — clean files exit 0, a deliberately broken workflow exits 1.
-- The negative eval case now carries three assertions, so every case in the Tier 3 dataset
-  has a behavior check and the `strict` validate run has no remaining gap.
+- The `validate` workflow now runs pinned `actionlint` 1.7.7 as a separate job. It verifies the
+  downloaded release archive against the publisher's checksum file before linting all workflow
+  YAML files.
+- The negative Tier 3 case now has three assertions, so every dataset case has a behavior check.
+
+### Verified
+
+- The workflow parser, shell syntax checks, real actionlint download/checksum/run, and both
+  negative controls (malformed workflow and leaked package member) pass locally on a clean
+  checkout.
+- GitHub Actions `validate` passed with the actionlint job and package assertions.
 
 
 ## [1.1.0] — 2026-11-22

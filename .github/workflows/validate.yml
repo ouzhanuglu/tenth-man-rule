@@ -29,7 +29,7 @@ jobs:
 
           assert names, "skill package is empty"
           assert all(n.startswith("tenth-man-rule/") for n in names), names
-          assert not any("/evals/" in n for n in names), names
+          assert not any(n.startswith(("tenth-man-rule/evals/", "tenth-man-rule/review/")) for n in names), names
           assert not any(n.endswith((".pyc", "INSTALL.md")) for n in names), names
           print("skill package:", names)
 
@@ -37,7 +37,8 @@ jobs:
               ev = zipfile.ZipFile(evals_pkg[0]).namelist()
               assert "INSTALL.md" in ev, ev
               assert "evals/evals.json" in ev, ev
-              print("evals package:", len(ev), "files, INSTALL.md at root")
+              assert "review/review-cases.json" in ev, ev
+              print("bundle:", len(ev), "files, INSTALL.md at root, evals+review trees")
           PY
 
       - name: Summarise

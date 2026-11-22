@@ -4,7 +4,7 @@ description: Assign a dissenter; use when a costly call is unanimous.
 license: MIT
 metadata:
   author: oguzhanuglu
-  version: 1.0.2
+  version: 1.1.0
   tags: [reasoning, decision-making, risk, groupthink]
   hermes:
     tags: [reasoning, decision-making, risk, groupthink]

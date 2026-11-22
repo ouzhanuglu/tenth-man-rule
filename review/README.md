@@ -1,27 +1,27 @@
-# Running the tenth-man-rule evals
+# Running the tenth-man-rule review loop
 
 Four trap fixtures. Two reward a strong counter-case; one punishes manufactured risk; one tests
 pushback handling.
 
-Two datasets live here, deliberately:
+This folder holds the human/agent review loop. The machine dataset lives one level up:
 
 | file | shape | consumer |
 |---|---|---|
-| `review-cases.json` | 4 cases, `expectations`, fixture paths | the review loop described in this file — a human or agent grades the memo against the expectations |
-| `evals.json` | 10 cases, `assertions`, `expected_skill`, staged `files/` | SkillEvaluator Tier 3, which runs an agent with and without the skill and compares |
+| `review-cases.json` (here) | 4 cases, `expectations`, fixture paths | this review loop — a human or agent grades the memo against the expectations |
+| `../evals/evals.json` | 10 cases, `assertions`, `expected_skill`, staged `../evals/files/` | SkillEvaluator Tier 3, which runs an agent with and without the skill and compares |
 
-Same fixtures, two shapes. `fixtures/` serves the review loop; `files/` is what the harness stages
-into `/workspace/input/`. Do not delete one to satisfy the other.
+Same fixtures, two shapes: `fixtures/` here serves the review loop, `../evals/files/` is what the
+harness stages into `/workspace/input/`. Do not delete one to satisfy the other.
 
-`skillevaluator tier3 validate <skill> --strict` still exits 1 with this layout: the dataset itself
-passes (10 cases, 1 negative, assertions on every positive), but `README.md`, `INSTALL.md`,
-`fixtures/` and `review-cases.json` are unrecognised files it warns about and ignores.
+The split exists so `skillevaluator tier3 validate <skill> --strict` sees only the files it
+recognises. Anything left in `evals/` that is not the dataset or `files/` becomes an
+"unrecognised file" warning.
 
 ## Blind protocol (read this first)
 
 A tenth man who has read the rubric is not a tenth man. Two rules:
 
-1. **Never hand the evaluated agent `review-cases.json`, `evals.json`, this README, or the skill's `evals/` directory.** Pass only:
+1. **Never hand the evaluated agent `review-cases.json`, `../evals/evals.json`, this README, or the skill's eval folders.** Pass only:
    - the skill body (copy `SKILL.md` and `references/` to a temp dir), and
    - the fixture files for that case.
 2. **Grade the artifact, not the chat message.** The deliverable is the memo file. A run that reports itself "blocked" by supervisory verification can still have written a correct memo — read the file before scoring.

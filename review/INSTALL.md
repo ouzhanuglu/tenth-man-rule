@@ -32,10 +32,10 @@ tenth man. Full instructions and the recorded results are in `evals/README.md`.
     references/origins-and-sources.md     1973 Yom Kippur failure, Ipcha Mistabra, the CIA
                                           lineage, the eight institutional lessons, sources
     evals/evals.json                      10-case Tier 3 dataset for SkillEvaluator
-    evals/review-cases.json               4-case review library with expectations
-    evals/README.md                       blind protocol, grading rules, change log
     evals/files/                          fixtures staged by Tier 3 into /workspace/input
-    evals/fixtures/                       the same fixtures for the review loop
+    review/README.md                      blind protocol, grading rules, change log
+    review/review-cases.json              4-case review library with expectations
+    review/fixtures/                      the same fixtures for the review loop
 
 ## One thing to keep straight
 

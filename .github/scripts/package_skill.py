@@ -25,7 +25,7 @@ from pathlib import Path
 
 EXCLUDED_DIRS = {"__pycache__", "node_modules", ".git"}
 EXCLUDED_NAMES = {".DS_Store", "*.pyc"}
-ROOT_ONLY_EXCLUDED = {"evals", ".github", ".git"}
+ROOT_ONLY_EXCLUDED = {"evals", "review", ".github", ".git"}
 
 
 def parse_frontmatter(text: str) -> dict:
@@ -136,17 +136,22 @@ def package(skill_dir: Path, out_dir: Path, name: str) -> list[Path]:
     produced.append(skill_path)
 
     evals_dir = skill_dir / "evals"
-    if evals_dir.is_dir():
-        evals_path = out_dir / f"{name}-evals.zip"
-        with zipfile.ZipFile(evals_path, "w", zipfile.ZIP_DEFLATED) as archive:
-            for path in sorted(evals_dir.rglob("*")):
-                if not path.is_file() or path.suffix == ".pyc" or path.name == ".DS_Store":
+    review_dir = skill_dir / "review"
+    bundle_path = out_dir / f"{name}-evals.zip"
+    if evals_dir.is_dir() or review_dir.is_dir():
+        with zipfile.ZipFile(bundle_path, "w", zipfile.ZIP_DEFLATED) as archive:
+            archives = [(evals_dir, "evals"), (review_dir, "review")]
+            for source_dir, prefix in archives:
+                if not source_dir.is_dir():
                     continue
-                rel = path.relative_to(skill_dir)
-                # The bundle's install note belongs at the archive root, beside the evals tree.
-                arcname = Path("INSTALL.md") if rel.as_posix() == "evals/INSTALL.md" else rel
-                archive.write(path, arcname)
-        produced.append(evals_path)
+                for path in sorted(source_dir.rglob("*")):
+                    if not path.is_file() or path.suffix == ".pyc" or path.name == ".DS_Store":
+                        continue
+                    rel = path.relative_to(skill_dir)
+                    # The bundle's install note belongs at the archive root.
+                    arcname = Path("INSTALL.md") if rel.as_posix() == "review/INSTALL.md" else rel
+                    archive.write(path, arcname)
+        produced.append(bundle_path)
 
     return produced
 

@@ -6,6 +6,25 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-11-22
+
+### Changed
+
+- The 4-case review library moved out of `evals/` into `review/` (`review-cases.json`,
+  `README.md`, `INSTALL.md`, `fixtures/`). `evals/` now holds only the Tier 3 dataset and its
+  staged `files/`, so `skillevaluator tier3 validate --strict` exits 0 with no warnings.
+- The release bundle still ships one archive: `INSTALL.md` at the root, then the `evals/` and
+  `review/` trees. The `validate` workflow asserts that split.
+
+### Added
+
+- A 10-case Tier 3 dataset for SkillEvaluator at `evals/evals.json`, with `assertions`,
+  `expected_skill` and staged `files/`, including one negative case. The 4-case review library
+  moves to `evals/review-cases.json`; both shapes are kept on purpose.
+- `## Purpose`, `## Prerequisites`, `## Limitations` and `## Troubleshooting` sections in
+  `SKILL.md`, plus `metadata.tags`, closing the SkillEvaluator quality findings. Description
+  rewritten trigger-first within the 60-character budget Hermes uses for its skill index.
+
 ### Added
 
 - A 10-case Tier 3 dataset for SkillEvaluator at `evals/evals.json`, with `assertions`,

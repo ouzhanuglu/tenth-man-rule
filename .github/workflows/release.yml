@@ -34,20 +34,39 @@ jobs:
       - name: Show what will be attached
         run: ls -l dist
 
+      - name: Resolve release notes from CHANGELOG.md
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if python3 .github/scripts/changelog_notes.py CHANGELOG.md "$TAG" > release-notes.md; then
+            echo "notes for $TAG come from CHANGELOG.md"
+            echo "notes_ok=1" >> "$GITHUB_ENV"
+            head -n 20 release-notes.md
+          else
+            echo "::warning::no CHANGELOG section for $TAG; falling back to generated notes"
+            echo "notes_ok=0" >> "$GITHUB_ENV"
+            rm -f release-notes.md
+          fi
+
       - name: Create or update the release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
+          NOTES_OK: ${{ env.notes_ok }}
         run: |
           set -euo pipefail
           if gh release view "$TAG" >/dev/null 2>&1; then
+            # Existing release: refresh assets only. Notes may have been edited by hand,
+            # so a re-run must not overwrite them.
             echo "release $TAG exists, uploading assets"
             gh release upload "$TAG" dist/* --clobber
+            exit 0
+          fi
+          if [ "$NOTES_OK" = "1" ]; then
+            echo "creating release $TAG with CHANGELOG notes"
+            gh release create "$TAG" --title "$TAG" --verify-tag --notes-file release-notes.md dist/*
           else
-            echo "creating release $TAG"
-            gh release create "$TAG" \
-              --title "$TAG" \
-              --verify-tag \
-              --generate-notes \
-              dist/*
+            echo "creating release $TAG with generated notes"
+            gh release create "$TAG" --title "$TAG" --verify-tag --generate-notes dist/*
           fi

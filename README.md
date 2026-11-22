@@ -60,6 +60,20 @@ Four cases, 32 expectations, all passing blind on two model routes:
 the rubric is not a tenth man. Copy `SKILL.md` and one fixture to a scratch dir and pass
 only those paths. Details and results in [`evals/README.md`](evals/README.md).
 
+## Releasing
+
+    git tag -a v1.2.0 -m "v1.2.0"
+    git push origin v1.2.0
+
+The `release` workflow validates `SKILL.md`, checks that `metadata.version` matches the tag's
+numeric core, builds `tenth-man-rule.skill` and `tenth-man-rule-evals.zip`, and attaches both
+to a new GitHub release. If the tag says `v1.2.0` and the frontmatter still says `1.0.0`, the
+job fails before anything is published.
+
+Every pull request runs the `validate` workflow: same packaging, no release, plus an assertion
+that the `.skill` contains only skill content. Build output is never committed (`dist*/` is
+ignored).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

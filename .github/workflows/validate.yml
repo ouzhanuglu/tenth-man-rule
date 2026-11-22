@@ -1,0 +1,44 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate frontmatter and build the archives
+        run: python3 .github/scripts/package_skill.py . dist
+
+      - name: Assert the package holds only skill content
+        run: |
+          python3 - <<'PY'
+          import glob, zipfile
+
+          skill_pkg = glob.glob("dist/*.skill")[0]
+          evals_pkg = glob.glob("dist/*-evals.zip")
+          names = zipfile.ZipFile(skill_pkg).namelist()
+
+          assert names, "skill package is empty"
+          assert all(n.startswith("tenth-man-rule/") for n in names), names
+          assert not any("/evals/" in n for n in names), names
+          assert not any(n.endswith((".pyc", "INSTALL.md")) for n in names), names
+          print("skill package:", names)
+
+          if evals_pkg:
+              ev = zipfile.ZipFile(evals_pkg[0]).namelist()
+              assert "INSTALL.md" in ev, ev
+              assert "evals/evals.json" in ev, ev
+              print("evals package:", len(ev), "files, INSTALL.md at root")
+          PY
+
+      - name: Summarise
+        run: ls -l dist

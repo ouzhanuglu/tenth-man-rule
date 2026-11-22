@@ -1,0 +1,14 @@
+api_access_30d.txt — weekly aggregate dump, source: api-gateway access logs only
+window: 2026-10-15 .. 2026-11-14
+total_requests: 12400
+distinct_external_ref: 12400
+duplicate_pairs: 0
+status_5xx_total: 2
+gateway_uptime: 99.998%
+
+notes from the dump header:
+- this export is produced from the gateway access log. Application-level logs
+  (Laravel) are a separate sink and are not included here.
+- the export contains only requests that reached the gateway. Requests rejected
+  at the edge (timeout before response) are logged in the edge-timeout sink,
+  not this file.

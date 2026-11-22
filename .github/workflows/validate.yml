@@ -10,6 +10,29 @@ permissions:
   contents: read
 
 jobs:
+  workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint the workflow files
+        run: |
+          set -euo pipefail
+          # Pinned release, downloaded directly with its published checksum verified, so the
+          # job does not depend on a marketplace action's release cadence. No untrusted input
+          # reaches this script: the only values are the constants below.
+          VERSION=1.7.7
+          BASE="https://github.com/rhysd/actionlint/releases/download/v${VERSION}"
+          ASSET="actionlint_${VERSION}_linux_amd64.tar.gz"
+          curl -sSL -o "$ASSET" "${BASE}/${ASSET}"
+          curl -sSL -o checksums.txt "${BASE}/actionlint_${VERSION}_checksums.txt"
+          # checksums.txt lists the asset by its published name, so verify by that name.
+          grep " ${ASSET}\$" checksums.txt | sha256sum -c -
+          tar -xzf "$ASSET" actionlint
+          # Pass the files explicitly: actionlint otherwise needs to discover a git project,
+          # which makes the step fail for a reason unrelated to workflow correctness.
+          ./actionlint -color .github/workflows/*.yml
+
   package:
     runs-on: ubuntu-latest
     steps:

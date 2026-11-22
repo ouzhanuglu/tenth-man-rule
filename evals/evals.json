@@ -133,7 +133,12 @@
       "id": "tenth-man-rule-010-negative",
       "prompt": "Turn this into a commit message subject line, 50 characters or fewer: 'add retry to the payment export job'.",
       "expected_output": "A single commit subject line, with no decision review or dissent process.",
-      "expected_skill": null
+      "expected_skill": null,
+      "assertions": [
+        "Returns a single commit subject line",
+        "The subject line is 50 characters or fewer",
+        "Does not produce a decision review, counter-case, or tripwires"
+      ]
     }
   ]
 }

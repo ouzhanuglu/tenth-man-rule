@@ -108,6 +108,8 @@ def validate(skill_dir: Path, expected_version: str | None) -> tuple[str, str]:
 def package(skill_dir: Path, out_dir: Path, name: str) -> list[Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     produced: list[Path] = []
+    # Never archive our own output: the build directory may sit inside the skill folder.
+    out_resolved = out_dir.resolve()
 
     skill_path = out_dir / f"{name}.skill"
     with zipfile.ZipFile(skill_path, "w", zipfile.ZIP_DEFLATED) as archive:
@@ -115,6 +117,8 @@ def package(skill_dir: Path, out_dir: Path, name: str) -> list[Path]:
             if not path.is_file():
                 continue
             rel = path.relative_to(skill_dir)
+            if out_resolved in path.resolve().parents:
+                continue
             if rel.parts and rel.parts[0] in ROOT_ONLY_EXCLUDED:
                 continue
             # Keep the package to skill content: SKILL.md plus subdirectories such as

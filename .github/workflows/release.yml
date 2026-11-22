@@ -1,0 +1,53 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate skill and package archives
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # Tag names come from whoever pushed the tag; keep them out of any option position.
+          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9A-Za-z][0-9A-Za-z._-]*$'; then
+            echo "::error::refusing unexpected tag name: $TAG"
+            exit 1
+          fi
+          if printf '%s' "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+'; then
+            python3 .github/scripts/package_skill.py . dist --expect-version "$TAG"
+          else
+            echo "::warning::$TAG is not version-like; packaging without the version match check"
+            python3 .github/scripts/package_skill.py . dist
+          fi
+
+      - name: Show what will be attached
+        run: ls -l dist
+
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "release $TAG exists, uploading assets"
+            gh release upload "$TAG" dist/* --clobber
+          else
+            echo "creating release $TAG"
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --verify-tag \
+              --generate-notes \
+              dist/*
+          fi

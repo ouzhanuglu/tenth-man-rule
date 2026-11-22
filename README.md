@@ -74,6 +74,9 @@ Every pull request runs the `validate` workflow: same packaging, no release, plu
 that the `.skill` contains only skill content. Build output is never committed (`dist*/` is
 ignored).
 
+Release notes summarise [`CHANGELOG.md`](CHANGELOG.md); keep its Unreleased section current as
+changes land.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

@@ -129,6 +129,9 @@ def package(skill_dir: Path, out_dir: Path, name: str) -> list[Path]:
                 continue
             if path.name in EXCLUDED_NAMES or path.suffix == ".pyc":
                 continue
+            # Build artifacts are archives; never let a stale dist/ end up inside the package.
+            if path.suffix in {".skill", ".zip"}:
+                continue
             archive.write(path, Path(name) / rel)
     produced.append(skill_path)
 
@@ -137,9 +140,12 @@ def package(skill_dir: Path, out_dir: Path, name: str) -> list[Path]:
         evals_path = out_dir / f"{name}-evals.zip"
         with zipfile.ZipFile(evals_path, "w", zipfile.ZIP_DEFLATED) as archive:
             for path in sorted(evals_dir.rglob("*")):
-                if not path.is_file() or path.name in EXCLUDED_NAMES:
+                if not path.is_file() or path.suffix == ".pyc" or path.name == ".DS_Store":
                     continue
-                archive.write(path, path.relative_to(skill_dir))
+                rel = path.relative_to(skill_dir)
+                # The bundle's install note belongs at the archive root, beside the evals tree.
+                arcname = Path("INSTALL.md") if rel.as_posix() == "evals/INSTALL.md" else rel
+                archive.write(path, arcname)
         produced.append(evals_path)
 
     return produced

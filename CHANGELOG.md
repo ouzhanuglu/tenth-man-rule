@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.2] — 2026-11-22
+
+### Changed
+
+- Release notes now come from this file. The `release` workflow extracts the section matching
+  the tag (`v1.0.2` → `## [1.0.2]`) and publishes it as the release body instead of a commit
+  list. If no section matches the tag, the job warns and falls back to GitHub's generated
+  notes rather than publishing an empty body.
+- A tag whose label does not match a section exactly — for example `v1.0.1-ci-notes` — takes
+  the fallback path by design; pre-release tags need their own heading such as
+  `## [1.1.0-rc1]`.
+- Re-running the workflow for an existing release refreshes assets only, so hand-edited
+  release notes are never overwritten.
+
 ## [1.0.1] — 2026-11-22
 
 ### Changed

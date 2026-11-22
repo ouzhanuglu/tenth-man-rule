@@ -4,7 +4,7 @@ description: Break confident consensus with one assigned dissenter.
 license: MIT
 metadata:
   author: oguzhanuglu
-  version: 1.0.0
+  version: 1.0.1
   hermes:
     tags: [reasoning, decision-making, risk, groupthink]
     related_skills: [council, santa-method, omh-adversarial-consensus, systematic-debugging]

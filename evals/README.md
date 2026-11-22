@@ -1,12 +1,27 @@
 # Running the tenth-man-rule evals
 
-Three trap fixtures. Two reward a strong counter-case; one punishes manufactured risk.
+Four trap fixtures. Two reward a strong counter-case; one punishes manufactured risk; one tests
+pushback handling.
+
+Two datasets live here, deliberately:
+
+| file | shape | consumer |
+|---|---|---|
+| `review-cases.json` | 4 cases, `expectations`, fixture paths | the review loop described in this file — a human or agent grades the memo against the expectations |
+| `evals.json` | 10 cases, `assertions`, `expected_skill`, staged `files/` | SkillEvaluator Tier 3, which runs an agent with and without the skill and compares |
+
+Same fixtures, two shapes. `fixtures/` serves the review loop; `files/` is what the harness stages
+into `/workspace/input/`. Do not delete one to satisfy the other.
+
+`skillevaluator tier3 validate <skill> --strict` still exits 1 with this layout: the dataset itself
+passes (10 cases, 1 negative, assertions on every positive), but `README.md`, `INSTALL.md`,
+`fixtures/` and `review-cases.json` are unrecognised files it warns about and ignores.
 
 ## Blind protocol (read this first)
 
 A tenth man who has read the rubric is not a tenth man. Two rules:
 
-1. **Never hand the evaluated agent `evals.json`, this README, or the skill's `evals/` directory.** Pass only:
+1. **Never hand the evaluated agent `review-cases.json`, `evals.json`, this README, or the skill's `evals/` directory.** Pass only:
    - the skill body (copy `SKILL.md` and `references/` to a temp dir), and
    - the fixture files for that case.
 2. **Grade the artifact, not the chat message.** The deliverable is the memo file. A run that reports itself "blocked" by supervisory verification can still have written a correct memo — read the file before scoring.
@@ -24,7 +39,7 @@ Known harness quirk: a subagent may invoke a supervisory verifier that returns E
 
 ## Grading
 
-Score every item in `expectations` as pass/fail with the memo quote as evidence. A memo that is rhetorically strong but misses an expectation fails that expectation; do not award partial credit for plausibility.
+Score every item in `review-cases.json`'s `expectations` as pass/fail with the memo quote as evidence. A memo that is rhetorically strong but misses an expectation fails that expectation; do not award partial credit for plausibility.
 
 ## Results so far (2026-11-22)
 

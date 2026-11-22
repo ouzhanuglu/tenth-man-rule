@@ -1,10 +1,11 @@
 ---
 name: tenth-man-rule
-description: Break confident consensus with one assigned dissenter.
+description: Assign a dissenter; use when a costly call is unanimous.
 license: MIT
 metadata:
   author: oguzhanuglu
   version: 1.0.2
+  tags: [reasoning, decision-making, risk, groupthink]
   hermes:
     tags: [reasoning, decision-making, risk, groupthink]
     related_skills: [council, santa-method, omh-adversarial-consensus, systematic-debugging]
@@ -17,6 +18,13 @@ When a group converges on a conclusion that matters, one member is formally assi
 The assignment is the whole mechanism. Dissent stops being an act of courage and becomes a job description. The tenth man is not braver or smarter than the other nine; he simply holds the one seat whose success is measured by whether the ignored scenario got looked at.
 
 Being right is optional. Looking is not. The tenth man holds no veto — the product is a tested conclusion, not a blocked one.
+
+## Purpose
+
+Give one person a standing mandate to test a conclusion the group has already accepted, and
+produce an artifact the decider can act on: the strongest surviving counter-case, what it would
+cost, the tripwires that would reveal it, and the falsifier that would kill it. A decision
+instrument, not a review ritual.
 
 ## What it is not
 
@@ -203,6 +211,39 @@ A tenth man who folds under pressure adds nothing; one who never concedes become
 - **Never use it as a stalling device and never as a veto.** If the case is answered, say which objection was answered and by what, then proceed.
 - **Report the dissent even when you reject it.** Hiding it because you decided against it is the exact failure the rule exists to prevent.
 - **A dissent that cannot change a decision is decoration.** If the memo cannot affect the outcome, say that plainly instead of filing it.
+
+## Prerequisites
+
+None. No network, keys, or installed tools are required. What the protocol does need:
+
+- a decision someone has already reached, stated as one falsifiable sentence;
+- access to the evidence it rests on — files, logs, a document, or the people who hold them;
+- for the commissioned mode, the ability to start a fresh agent context with read-only access.
+
+## Limitations
+
+- It tests reasoning, not reality. A memo can be internally sound and still miss a risk nobody has
+  imagined yet.
+- Confidence numbers in the memo are calibrated judgment, not measurement. Do not average them
+  across memos or compare them between different decisions.
+- The commissioned mode costs a separate context and real wall-clock time. On cheap, reversible
+  choices that is waste — see the calibration table.
+- It does not decide and holds no veto. A memo that cannot reach the decider changes nothing.
+- The eval library measures protocol conformance on synthetic fixtures. It is not evidence about
+  any particular real decision.
+- The rule is only as good as the evidence it can reach. With no access to sources it degrades
+  into opinion, and opinion read aloud is what the rule exists to replace.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| The memo has no falsifier | The counter-case is a feeling, not an argument | Drop it and say so; do not pad the memo |
+| Every decision comes back `reopen` | Permanent-no: the reviewer is scoring arguments rather than decisions | Force a per-point concede/hold verdict and concede what the evidence answered |
+| Every decision comes back `proceed` | Rubber stamp: the reviewer was picked to agree, or read the author's reasoning first | Fresh context; hand over the claim and the evidence, not the argument |
+| The counter-case cites nothing | Roleplay instead of investigation | One search, query, or test per objection; label the rest as untested hypotheses |
+| Pushback is treated as an answer | Pressure misread as evidence | Classify it: answers the argument, answers a different objection, or applies pressure |
+| The memo runs to pages and nobody reads it | Prose instead of fields | Trim prose, not fields; one screen |
 
 ## Origins and sources
 

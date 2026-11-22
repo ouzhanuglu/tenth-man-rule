@@ -1,0 +1,9 @@
+quarter,segment,accounts,churned,churn_pct,note
+2025-Q4,SMB,1804,38,2.11,
+2026-Q1,SMB,1831,44,2.40,
+2026-Q2,SMB,1866,71,3.80,12% list increase effective 2026-04
+2026-Q3,SMB,1892,74,3.91,
+2025-Q4,ENT,121,1,0.83,
+2026-Q1,ENT,123,1,0.81,
+2026-Q2,ENT,125,1,0.80,
+2026-Q3,ENT,126,1,0.79,

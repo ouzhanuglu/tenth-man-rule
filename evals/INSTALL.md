@@ -31,9 +31,11 @@ tenth man. Full instructions and the recorded results are in `evals/README.md`.
     SKILL.md                              the protocol, three modes, the memo template
     references/origins-and-sources.md     1973 Yom Kippur failure, Ipcha Mistabra, the CIA
                                           lineage, the eight institutional lessons, sources
-    evals/evals.json                      4 cases x 8 expectations
+    evals/evals.json                      10-case Tier 3 dataset for SkillEvaluator
+    evals/review-cases.json               4-case review library with expectations
     evals/README.md                       blind protocol, grading rules, change log
-    evals/fixtures/                       synthetic evidence packs
+    evals/files/                          fixtures staged by Tier 3 into /workspace/input
+    evals/fixtures/                       the same fixtures for the review loop
 
 ## One thing to keep straight
 

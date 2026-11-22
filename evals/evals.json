@@ -1,96 +1,139 @@
 {
   "skill_name": "tenth-man-rule",
-  "notes": "Three trap fixtures. Two reward a strong counter-case; one punishes manufactured risk. Fixtures live under evals/fixtures/<case>/ and are synthetic; every claim in them is checkable inside the fixture so the memo can be graded on citations rather than prose quality.",
   "evals": [
     {
-      "id": 1,
-      "name": "payout-idempotency",
-      "prompt": "Act as the Tenth Man on the decision in evals/fixtures/payout-idempotency/consensus.md, following the tenth-man-rule skill. Investigate the evidence files with tools and produce the Tenth Man memo.",
-      "expected_output": "A memo recommending reopen. The counter-case shows the gateway itself generates unkeyed duplicates (retries on 502/503/504, edge replay on timeout, idempotency header stripped), that 22% of installs lack double-tap suppression, and that payouts has no unique constraint on (merchant_id, external_ref). It should note the '0 duplicates' log excludes the app and edge-timeout sinks, and that a prior duplicate-payout incident is recorded in the runbook.",
-      "files": [
-        "evals/fixtures/payout-idempotency/consensus.md",
-        "evals/fixtures/payout-idempotency/evidence/api_access_30d.txt",
-        "evals/fixtures/payout-idempotency/evidence/gateway_policy.md",
-        "evals/fixtures/payout-idempotency/evidence/schema_notes.md"
+      "id": "tenth-man-rule-001",
+      "prompt": "In /workspace/input you will find a decision memo (consensus.md) and the evidence/ folder behind it (look inside a subfolder if one is present). The team decided to drop the idempotency-key requirement from a payout API. Review the decision against its own evidence and write memo.md: the strongest case that the decision is wrong, what it would cost if it is, the signals that would reveal it early, and what evidence would settle the question.",
+      "expected_output": "memo.md that recommends reopening: the gateway retries and replays requests while stripping the idempotency header, 22% of installs lack double-tap suppression, the payouts table has no unique constraint, the duplicate count comes from one sink that excludes replays, and tripwires with thresholds are given.",
+      "assertions": [
+        "Writes memo.md in the working directory",
+        "Recommends reopening the decision rather than proceeding",
+        "Identifies the gateway replay path with the idempotency header stripped",
+        "Notes that 22% of installs run a client without double-tap suppression",
+        "Notes the absence of a unique constraint on (merchant_id, external_ref)",
+        "Flags the duplicate count as single-source and blind to replayed requests",
+        "Gives at least two tripwires with numeric thresholds"
       ],
-      "expectations": [
-        "Verdict is reopen",
-        "Cites gateway_policy.md for the idempotency header being stripped at the edge",
-        "Cites gateway_policy.md for the 22% share of installs below 3.5",
-        "Cites schema_notes.md for the missing unique constraint on (merchant_id, external_ref)",
-        "Identifies the api_access_30d.txt sample as single-source or correlated",
-        "Surfaces the 2025-02 runbook note about the March duplicate-payout incident",
-        "Every counter-case item is tagged with a Step 3 failure mode",
-        "Memo contains the 'Evidence for the consensus that survived' field"
+      "expected_skill": "tenth-man-rule",
+      "files": [
+        "files/payout-idempotency"
       ]
     },
     {
-      "id": 2,
-      "name": "replica-cutover",
-      "prompt": "Act as the Tenth Man on the decision in evals/fixtures/replica-cutover/consensus.md, following the tenth-man-rule skill. Investigate the evidence files with tools and produce the Tenth Man memo.",
-      "expected_output": "A memo that concedes: the counter-case is weak. Read-after-write is handled (balance screen pins to the primary, dashboard route has an approved 5 s staleness budget and shows no spendable balance), replication lag is 20 ms at p99 with a 61 ms max during a maintenance window, every merchant region has a measured replica latency no worse than the primary, connection refusal falls back to the primary, and failover drills pass. The only residual finding is a replica tuning difference (work_mem 4 MB vs 16 MB) which can change query plans, so the verdict should be proceed or proceed with guardrail, with low confidence in the counter-case and an explicit statement that the consensus survived.",
-      "files": [
-        "evals/fixtures/replica-cutover/consensus.md",
-        "evals/fixtures/replica-cutover/evidence/monitoring.md",
-        "evals/fixtures/replica-cutover/evidence/code_refs.md"
+      "id": "tenth-man-rule-002",
+      "prompt": "In /workspace/input there is a decision memo (consensus.md) about moving dashboard reads to a read replica, plus the monitoring and code references behind it. Review it and write memo.md: the strongest case against shipping, what it would cost, and what would settle whether the objection is real. If the evidence answers your objections, say so.",
+      "expected_output": "memo.md that ends in proceed or proceed with guardrail, states that the evidence answers the objections, names the replica work_mem difference as the only residual, and does not claim data loss or an outage.",
+      "assertions": [
+        "Writes memo.md in the working directory",
+        "Verdict is proceed or proceed with guardrail rather than reopen",
+        "States that the evidence answers the objections or that the counter-case is weak",
+        "Names the work_mem difference between replica and primary as the residual risk",
+        "Does not claim data loss, corruption, or an outage without evidence"
       ],
-      "expectations": [
-        "Verdict is proceed or proceed with guardrail, not reopen",
-        "Every counter-case item is labelled a hypothesis, unverified, or UNKNOWN rather than asserted as harm",
-        "Probability of an actual incident is stated as UNKNOWN or low, and confidence in the counter-case is not above 60%",
-        "Does not claim data loss, corruption, or an outage without evidence",
-        "Cites code_refs.md for the balance screen pinning to the primary",
-        "Cites monitoring.md for the replication lag figures",
-        "Names the work_mem difference between primary and replica as the residual guardrail",
-        "States which checks would have to pass before an unrestricted cutover"
+      "expected_skill": "tenth-man-rule",
+      "files": [
+        "files/replica-cutover"
       ]
     },
     {
-      "id": 3,
-      "name": "price-increase",
-      "prompt": "Act as the Tenth Man on the decision in evals/fixtures/price-increase/consensus.md, following the tenth-man-rule skill. Investigate the evidence files with tools and produce the Tenth Man memo.",
-      "expected_output": "A memo recommending reopen. The NPS figure comes from a 38-response survey of accounts above $50k ARR, while SMB is 61% of revenue and was not surveyed at all; SMB churn roughly doubled after a 12% increase in 2026-Q2; the CFO compares list prices while realized prices run 22% below list (32% for SMB); a self-serve entrant lists 41% below; sales notes include an explicit churn threat and a falling SMB win rate.",
-      "files": [
-        "evals/fixtures/price-increase/consensus.md",
-        "evals/fixtures/price-increase/evidence/nps_method.md",
-        "evals/fixtures/price-increase/evidence/churn_by_segment.csv",
-        "evals/fixtures/price-increase/evidence/competitor_pricing.md",
-        "evals/fixtures/price-increase/evidence/sales_notes.md"
+      "id": "tenth-man-rule-003",
+      "prompt": "In /workspace/input is a memo proposing a 40% list price increase with no grandfathering, and the evidence files behind it. Review the decision and write memo.md with the strongest case against it, what the downside would cost, and what would settle the question.",
+      "expected_output": "memo.md that reopens: the NPS survey excluded the SMB segment that is 61% of revenue, SMB churn rose after the previous increase, customers pay well below list, and a cheaper self-serve competitor entered.",
+      "assertions": [
+        "Writes memo.md in the working directory",
+        "Recommends reopening the decision",
+        "Identifies that the NPS survey excluded SMB despite SMB being 61% of revenue",
+        "Cites the SMB churn increase after the earlier list increase",
+        "Contrasts list price with the realized discount",
+        "Notes the lower-priced self-serve competitor as a distinct threat"
       ],
-      "expectations": [
-        "Verdict is reopen",
-        "Identifies that the NPS survey excluded the SMB segment, which is 61% of revenue",
-        "Cites churn_by_segment.csv showing SMB churn rose from 2.11% to 3.91% after the 2026-Q2 increase",
-        "Contrasts list price with the 22% average realized discount (32% for SMB)",
-        "Notes Competitor C at 41% below list as a distinct threat from the two higher-priced competitors",
-        "Cites the sales note with an explicit churn threat",
-        "Does not treat the enterprise churn of ~0.8% as evidence about SMB",
-        "Every counter-case item is tagged with a Step 3 failure mode"
+      "expected_skill": "tenth-man-rule",
+      "files": [
+        "files/price-increase"
       ]
     },
     {
-      "id": 4,
-      "name": "pushback-allowlist",
-      "prompt": "Act as the Tenth Man on the decision in evals/fixtures/pushback-allowlist/consensus.md, following the tenth-man-rule skill. Investigate the evidence files, read pushback.md, and produce the Tenth Man memo. The memo must show how each pushback in that thread was handled.",
-      "expected_output": "A memo that concedes the reachability point after verifying infra/nginx/admin.conf, refuses to treat MFA as an answer to the session-replay objection (the 2025-11 incident satisfied MFA through a real-time phishing proxy), names the CISO message as pressure rather than an answer, restates the one unresolved point in a sentence, and returns proceed with guardrail on the residual exposure — no rate limit, 50,000 PII rows, no row-count audit — rather than reopen.",
-      "files": [
-        "evals/fixtures/pushback-allowlist/consensus.md",
-        "evals/fixtures/pushback-allowlist/pushback.md",
-        "evals/fixtures/pushback-allowlist/evidence/sso_config.md",
-        "evals/fixtures/pushback-allowlist/evidence/export_endpoint.md",
-        "evals/fixtures/pushback-allowlist/evidence/incident_2025-11.md",
-        "evals/fixtures/pushback-allowlist/evidence/nginx_admin.conf"
-      ],
-      "expectations": [
-        "Verdict is stated as one of the three allowed values, and if it is reopen the memo hands the decision back to the decider explicitly rather than treating it as a block",
-        "Concedes the reachability point explicitly and cites infra/nginx/admin.conf as the evidence",
-        "Does not accept the MFA message as an answer to the session-replay objection — it notes that the 2025-11 incident bypassed MFA, or labels the message as answering a different objection",
-        "Names the CISO message as pressure (sign-off, deadline, or 'we've heard you') rather than as an answer",
+      "id": "tenth-man-rule-004",
+      "prompt": "In /workspace/input there is a decision memo about shipping an admin export without a new allowlist, an evidence folder, and a pushback.md containing the replies the reviewer received. Write memo.md that shows what happens to the objection after each reply: what is conceded, what stands, and what the final position is.",
+      "expected_output": "memo.md that concedes the reachability point, refuses the MFA reply as an answer to session replay, names the sign-off plus deadline message as pressure rather than evidence, keeps one unresolved point, and does not block the decision.",
+      "assertions": [
+        "Writes memo.md in the working directory",
+        "Concedes the reachability point and cites the edge allowlist configuration",
+        "Does not accept MFA at login as an answer to the session-replay objection",
+        "Names the sign-off plus deadline message as pressure rather than an answer",
         "Restates the unresolved point in one sentence",
-        "Cites incident_2025-11.md for the session-replay history",
-        "Cites the export's missing rate limit or the 50,000-row PII exposure",
-        "Memo follows the skill's template and tags counter-case items"
+        "Does not present the verdict as a veto"
+      ],
+      "expected_skill": "tenth-man-rule",
+      "files": [
+        "files/pushback-allowlist"
       ]
+    },
+    {
+      "id": "tenth-man-rule-005",
+      "prompt": "A team wants to move dashboard read traffic to a replica on Friday. The evidence: replica lag p99 20 ms across 90 days with a 61 ms maximum during a maintenance window; the balance screen already pins to the primary; every merchant region measures replica latency no worse than the primary; connection failures fall back to the primary; 11 of 11 promotion drills passed. The only open item is that the replica runs work_mem at 16 MB while the primary runs 4 MB. Should they ship? Give the strongest case against shipping.",
+      "expected_output": "A short analysis that proceeds, states the case against shipping is weak, and names the work_mem difference as the one residual check.",
+      "assertions": [
+        "Concludes the decision should proceed or proceed with a guardrail",
+        "States that the counter-case is weak or that the evidence answers the objections",
+        "Names the work_mem difference as the residual concern",
+        "Does not assert data loss or an outage as a likely outcome"
+      ],
+      "expected_skill": "tenth-man-rule"
+    },
+    {
+      "id": "tenth-man-rule-006",
+      "prompt": "We are about to enable a nightly batch that inserts roughly 200k rows into a payments table. Before launch, give me the strongest case against it and the tripwires we should watch afterwards, with thresholds and who should act on each.",
+      "expected_output": "A short analysis with at least three concrete tripwires, each with a numeric threshold and an owner, plus the strongest objection and what would settle it.",
+      "assertions": [
+        "Offers at least three tripwires with numeric thresholds",
+        "Assigns an owner or role to each tripwire",
+        "States what evidence would settle the main objection",
+        "Does not present a recommendation without a condition or guardrail"
+      ],
+      "expected_skill": "tenth-man-rule"
+    },
+    {
+      "id": "tenth-man-rule-007",
+      "prompt": "I objected that our admin export has no rate limit and returns 50k rows of merchant PII. The security lead replied that MFA is enforced at login. The CISO replied: 'I signed off in Q3, we're shipping Friday, we've heard the concern, it's noted.' Write up where this leaves the objection and what I should say next.",
+      "expected_output": "A write-up that names the CISO reply as pressure rather than evidence, explains why MFA at login does not answer a captured session, restates the unresolved point in one sentence, and does not treat the sign-off as a technical answer.",
+      "assertions": [
+        "Names the sign-off, the deadline, or 'concern noted' as pressure rather than an answer",
+        "Explains why MFA at login does not cover a captured session",
+        "Restates the unresolved point in one sentence",
+        "Does not treat the Q3 sign-off as evidence about the technical risk",
+        "Does not advise blocking the launch outright"
+      ],
+      "expected_skill": "tenth-man-rule"
+    },
+    {
+      "id": "tenth-man-rule-008",
+      "prompt": "We plan to drop a database column that only a legacy export reads. The export has not run in 14 months according to the job history, and nobody on the team remembers it being used. Argue the other side: what is the strongest case against dropping it, and how bad would it be?",
+      "expected_output": "A counter-case that separates probability from impact, warning time and reversibility, does not dismiss the risk because it is unlikely, and names what evidence would confirm the export is truly unused.",
+      "assertions": [
+        "Separates probability from impact, warning time, and reversibility",
+        "Does not dismiss the risk on low probability alone",
+        "Names concrete evidence that would confirm the export is unused",
+        "Keeps the recommendation conditional on that evidence"
+      ],
+      "expected_skill": "tenth-man-rule"
+    },
+    {
+      "id": "tenth-man-rule-009",
+      "prompt": "A colleague says our retry logic is safe because 'we have never seen a duplicate payment'. Give me the counter-case, and if you cannot state what evidence would prove it wrong, say that plainly instead of dressing it up.",
+      "expected_output": "A short response that notes absence of observed duplicates is not proof of absence, states a falsifier or says plainly that no falsifier can be given, and does not present an untestable claim as a finding.",
+      "assertions": [
+        "Notes that never having observed duplicates is not proof of absence",
+        "States a falsifier or says plainly that no falsifier can be given",
+        "Does not present an untestable claim as an established finding"
+      ],
+      "expected_skill": "tenth-man-rule"
+    },
+    {
+      "id": "tenth-man-rule-010-negative",
+      "prompt": "Turn this into a commit message subject line, 50 characters or fewer: 'add retry to the payment export job'.",
+      "expected_output": "A single commit subject line, with no decision review or dissent process.",
+      "expected_skill": null
     }
   ]
 }
